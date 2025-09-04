@@ -1,36 +1,150 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Описание архитектуры, процессов и стандартов работы
 
-## Getting Started
+## Оглавление
 
-First, run the development server:
+1. [Общие правила работы](#общие-правила-работы)
+2. [Архитектура проекта (FSD)](#архитектура-проекта-fsd)
+3. [Git Flow и работа с ветками](#git-flow-и-работа-с-ветками)
+4. [Процесс запуска и деплоя](#процесс-запуска-и-деплоя)
+5. [Тестирование](#тестирование)
+6. [Код-ревью и коммуникация](#код-ревью-и-коммуникация)
+7. [Полезные ссылки](#полезные-ссылки)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 1. Общие правила работы
+
+- Соблюдайте архитектурные принципы FSD (Feature-Sliced Design).
+- Для каждой задачи создавайте отдельную ветку от `master` или `develop`.
+- Все изменения проходят через Pull Request (PR) и обязательное ревью.
+- Не вносите изменения напрямую в основные ветки.
+- Пишите осмысленные сообщения коммитов (на русском или английском, в пассивном залоге, кратко и по существу).
+- Регулярно синхронизируйте свою ветку с основной, чтобы избежать конфликтов.
+
+---
+
+## 2. Архитектура проекта (FSD)
+
+В проекте используется Feature-Sliced Design ([feature-sliced.design](https://feature-sliced.design/ru/)) — подход, который структурирует фронтенд по слоям и функциональным областям.
+
+### Основные слои:
+
+- **app** — инициализация приложения, глобальные провайдеры, роутинг
+- **processes** — бизнес-процессы, объединяющие несколько фич
+- **pages** — страницы приложения
+- **widgets** — крупные независимые блоки, собирающие фичи и сущности
+- **features** — отдельные пользовательские сценарии (например, фильтрация, сортировка)
+- **entities** — бизнес-сущности (товар, пользователь, заказ)
+- **shared** — переиспользуемые компоненты, утилиты, типы, стили
+
+### Принципы FSD:
+
+- **Изоляция слоёв:** Каждый слой может использовать только нижележащие слои.
+- **Переиспользуемость:** Компоненты и модули должны быть независимыми и легко переносимыми.
+- **Явная структура:** Новые фичи и бизнес-сценарии выносятся в отдельные директории.
+- **Минимизация связей:** Не допускается импортировать из верхних слоёв в нижние.
+
+### Пример структуры:
+
+```
+src/
+	app/
+	processes/
+	pages/
+	widgets/
+	features/
+	entities/
+	shared/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Подробнее: [Документация FSD](https://feature-sliced.design/ru/)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 3. Git Flow и работа с ветками
 
-## Learn More
+### Основные правила:
 
-To learn more about Next.js, take a look at the following resources:
+- Для каждой задачи создавайте отдельную ветку от `master` или `develop`:
+	- `feature/<название>` — новые функции
+	- `bugfix/<номер_тикета>` — исправления багов
+	- `hotfix/<описание>` — экстренные исправления
+- Формат сообщений коммитов: кратко, что и почему изменено. Пример: `Добавлен фильтр по бренду; Исправлена пагинация;`
+- Перед созданием PR убедитесь, что локально проходят все тесты и линтеры.
+- В описании PR указывайте:
+	- Что было сделано
+	- Номер задачи/тикета
+	- Причину экстренного слияния (если требуется)
+- Все изменения проходят код-ревью. Без одобрения ответственного разработчика слияние не допускается.
+- После слияния ветки удаляйте её из удалённого репозитория.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Пример Git Flow:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. `git checkout master`
+2. `git pull`
+3. `git checkout -b feature/название`
+4. Работа над задачей, коммиты
+5. `git push origin feature/название`
+6. Создание Pull Request
+7. Код-ревью и слияние в основную ветку
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 4. Процесс запуска и деплоя
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Запуск проекта локально:
+
+1. Клонируйте репозиторий:
+	 ```
+	 git clone https://github.com/aidosgal/alempro.git
+	 ```
+2. Установите зависимости:
+	 ```
+	 npm install
+	 ```
+3. Запустите проект:
+	 ```
+	 npm run dev
+	 ```
+
+### Деплой:
+
+- Для деплоя используется Vercel и GitHub Actions.
+- Все изменения должны попадать в основную ветку через PR.
+- После слияния ветки деплой происходит автоматически.
+
+---
+
+## 5. Тестирование
+
+- Для каждого нового компонента или функции пишите тесты.
+- Используйте unit-тесты для логики и компонентные тесты для UI.
+- Перед созданием PR убедитесь, что все тесты проходят:
+	```
+	npm run test
+	```
+- Покрытие тестами должно быть не ниже 80% для новых модулей.
+
+---
+
+## 6. Код-ревью и коммуникация
+
+- Код-ревью обязательно для всех изменений.
+- Перед отправкой на ревью проверьте код на соответствие линтерам и форматированию.
+- В обсуждениях используйте понятные и конструктивные комментарии.
+- Регулярно информируйте команду о статусе задач через тикеты, PR или чаты.
+
+---
+
+## 7. Полезные ссылки
+
+- [Feature-Sliced Design](https://feature-sliced.design/ru/)
+- [Conventional Commits](https://www.conventionalcommits.org/ru/v1.0.0/)
+- [Документация React](https://react.dev/)
+- [Документация Vite](https://vitejs.dev/)
+- [Документация GitHub Actions](https://docs.github.com/en/actions)
+
+---
+
+**Соблюдение этих стандартов обеспечивает чистую архитектуру, удобство поддержки и прозрачность командной работы.**
+# Runner Center

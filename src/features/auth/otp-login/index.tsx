@@ -44,7 +44,7 @@ export const OTPLoginForm = () => {
       } else {
         setStep({ phone: formattedPhone, step: 'otp' });
       }
-    } catch (err) {
+    } catch {
       setError('Произошла ошибка при отправке SMS');
     } finally {
       setIsLoading(false);
@@ -68,7 +68,7 @@ export const OTPLoginForm = () => {
       } else {
         router.push('/');
       }
-    } catch (err) {
+    } catch {
       setError('Произошла ошибка при проверке кода');
     } finally {
       setIsLoading(false);
@@ -87,7 +87,7 @@ export const OTPLoginForm = () => {
       if (error) {
         setError(error.message);
       }
-    } catch (err) {
+    } catch {
       setError('Произошла ошибка при повторной отправке SMS');
     } finally {
       setIsLoading(false);

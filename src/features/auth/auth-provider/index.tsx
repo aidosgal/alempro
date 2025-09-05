@@ -4,12 +4,18 @@ import { createContext, useContext, useEffect, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/shared/supabase/client';
 import { useAuthStore } from '@/entities/auth';
+import type { Session } from '@supabase/supabase-js';
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-const AuthContext = createContext<{}>({});
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface AuthContextType {
+  // Add auth context methods here if needed in the future
+}
+
+const AuthContext = createContext<AuthContextType>({});
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { setSession, setLoading, logout, isAuthenticated } = useAuthStore();
@@ -31,7 +37,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             console.error('Session error:', error);
             logout();
           } else {
-            setSession(session as any);
+            setSession(session as Session | null);
           }
         }
       } catch (error) {
@@ -52,7 +58,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       async (event, session) => {
         if (!mounted) return;
         
-        setSession(session as any);
+        setSession(session as Session | null);
 
         if (event === 'SIGNED_IN') {
           // If user is on auth pages and gets signed in, redirect to home
@@ -91,8 +97,5 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
   return context;
 };

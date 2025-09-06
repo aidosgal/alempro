@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createClient } from '@/shared/supabase/client';
-import { Chat, ChatWithApplicant, Message, MessageWithSender, CreateMessageData } from './types';
+import { ChatWithApplicant, MessageWithSender, CreateMessageData } from './types';
 
 interface ChatStore {
   chats: ChatWithApplicant[];

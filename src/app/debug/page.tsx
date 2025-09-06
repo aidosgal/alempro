@@ -5,10 +5,31 @@ import { useAuthStore } from '@/entities/auth';
 import { createClient } from '@/shared/supabase/client';
 import DefaultLayout from '@/widgets/layout/DefaultLayout';
 
+interface DebugInfo {
+  user?: {
+    id: string;
+    phone?: string;
+    email?: string;
+  };
+  manager?: {
+    data: unknown;
+    error?: string;
+  };
+  organizationUsers?: {
+    data: unknown;
+    error?: string;
+  };
+  allManagers?: {
+    data: unknown;
+    error?: string;
+  };
+  error?: string;
+}
+
 export default function DebugPage() {
   const { user } = useAuthStore();
   const supabase = createClient();
-  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,7 +41,7 @@ export default function DebugPage() {
       }
 
       try {
-        const info: any = {
+        const info: DebugInfo = {
           user: {
             id: user.id,
             phone: user.phone,
@@ -55,8 +76,8 @@ export default function DebugPage() {
         info.allManagers = { data: allManagers, error: allManagersError?.message };
 
         setDebugInfo(info);
-      } catch (error: any) {
-        setDebugInfo({ error: error.message });
+      } catch (error) {
+        setDebugInfo({ error: error instanceof Error ? error.message : 'Unknown error' });
       } finally {
         setLoading(false);
       }

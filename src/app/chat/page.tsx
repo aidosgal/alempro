@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/entities/auth';
-import { useChatStore, ChatWithApplicant, CreateOrderData } from '@/entities/chat';
+import { useChatStore, ChatWithApplicant } from '@/entities/chat';
 import { ChatList } from '@/features/chat';
 import ChatLayout from '@/widgets/layout/ChatLayout';
 import { createClient } from '@/shared/supabase/client';
@@ -11,7 +11,7 @@ import { createClient } from '@/shared/supabase/client';
 export default function ChatPage() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { chats, loading, error, fetchChats, subscribeToChats, clearError } = useChatStore();
+  const { chats, error, fetchChats, subscribeToChats, clearError } = useChatStore();
   
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [loadingOrganization, setLoadingOrganization] = useState(true);
@@ -70,17 +70,6 @@ export default function ChatPage() {
 
   const handleChatSelect = (chat: ChatWithApplicant) => {
     router.push(`/chat/${chat.id}`);
-  };
-
-  const handleCreateOrder = async (data: CreateOrderData) => {
-    if (!organizationId) return;
-
-    try {
-      // This will be handled by the individual chat page
-      console.log('Creating order:', data);
-    } catch (error) {
-      console.error('Error creating order:', error);
-    }
   };
 
   if (loadingOrganization) {

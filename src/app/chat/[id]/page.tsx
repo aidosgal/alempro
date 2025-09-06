@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/entities/auth';
 import { useChatStore, ChatWithApplicant, CreateMessageData, CreateOrderData } from '@/entities/chat';
-import { ChatList, MessageList, MessageInput, CreateOrderModal, DebugMessageButtons } from '@/features/chat';
+import { ChatList, MessageList, MessageInput, CreateOrderModal } from '@/features/chat';
 import ChatLayout from '@/widgets/layout/ChatLayout';
 import { createClient } from '@/shared/supabase/client';
 

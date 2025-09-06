@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { MessageWithSender } from '@/entities/chat';
+import Image from 'next/image';
 
 interface MessageListProps {
   messages: MessageWithSender[];
@@ -37,7 +38,12 @@ export function MessageList({ messages, loading }: MessageListProps) {
   };
 
   const renderMessageContent = (message: MessageWithSender) => {
-    const metadata = message.metadata as any;
+    const metadata = message.metadata as { 
+      type?: string; 
+      fileName?: string; 
+      fileSize?: number; 
+      [key: string]: unknown; 
+    } | null;
     
     // Handle order messages using the orders array
     if (message.orders && message.orders.length > 0) {
@@ -61,7 +67,10 @@ export function MessageList({ messages, loading }: MessageListProps) {
               <div>
                 <p className="text-xs opacity-70 mb-1">Услуги:</p>
                 <div className="flex flex-wrap gap-1">
-                  {order.order.order_services.map((orderService: any) => (
+                  {order.order.order_services.map((orderService: { 
+                    id: string; 
+                    service: { id: string; title: string; price: number | null } 
+                  }) => (
                     <span 
                       key={orderService.id} 
                       className="inline-block bg-white bg-opacity-20 px-2 py-1 rounded text-xs"
@@ -103,15 +112,23 @@ export function MessageList({ messages, loading }: MessageListProps) {
     if (message.attachments && message.attachments.length > 0) {
       return (
         <div className="space-y-2">
-          {message.attachments.map((attachment: any) => {
+          {message.attachments.map((attachment: { 
+            id: string; 
+            filename?: string; 
+            filetype?: string; 
+            url: string; 
+            filesize?: number; 
+          }) => {
             const isImage = attachment.filetype?.startsWith('image/');
             
             if (isImage) {
               return (
                 <div key={attachment.id} className="relative">
-                  <img 
+                  <Image 
                     src={attachment.url} 
                     alt={attachment.filename || 'Shared image'} 
+                    width={400}
+                    height={300}
                     className="max-w-sm rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                     onError={(e) => {
                       e.currentTarget.src = '/placeholder-image.png';
@@ -164,9 +181,11 @@ export function MessageList({ messages, loading }: MessageListProps) {
       return (
         <div className="space-y-2">
           <div className="relative">
-            <img 
+            <Image 
               src={message.content} 
               alt="Shared image" 
+              width={400}
+              height={300}
               className="max-w-sm rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
               onError={(e) => {
                 e.currentTarget.src = '/placeholder-image.png';
@@ -174,7 +193,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
               onClick={() => window.open(message.content, '_blank')}
             />
           </div>
-          {metadata.fileName && (
+          {metadata.fileName && typeof metadata.fileName === 'string' && (
             <p className="text-xs opacity-70">{metadata.fileName}</p>
           )}
         </div>
@@ -193,9 +212,9 @@ export function MessageList({ messages, loading }: MessageListProps) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">
-                {metadata.fileName || 'Document'}
+                {(typeof metadata.fileName === 'string' ? metadata.fileName : null) || 'Document'}
               </p>
-              {metadata.fileSize && (
+              {metadata.fileSize && typeof metadata.fileSize === 'number' && (
                 <p className="text-xs opacity-70">
                   {(metadata.fileSize / 1024 / 1024).toFixed(2)} MB
                 </p>
@@ -278,7 +297,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
             <div className="space-y-3">
               {dayMessages.map((message) => {
                 const isManager = message.sender.type === 'manager';
-                const metadata = message.metadata as any;
+                const metadata = message.metadata as { type?: string; [key: string]: unknown } | null;
                 const hasOrder = message.orders && message.orders.length > 0;
                 const hasAttachment = message.attachments && message.attachments.length > 0;
                 const isLegacySpecialContent = metadata?.type && ['image', 'document', 'order'].includes(metadata.type);

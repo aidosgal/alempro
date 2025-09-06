@@ -13,7 +13,7 @@ export interface Message {
   chat_id: string;
   content: string;
   created_at: string | null;
-  metadata: any | null;
+  metadata: Record<string, unknown> | null;
   sender_applicant_id: string | null;
   sender_organization_manager_id: string | null;
 }

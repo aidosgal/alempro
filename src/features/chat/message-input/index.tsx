@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { CreateMessageData, MessageMetadata } from '@/entities/chat';
+import { CreateMessageData } from '@/entities/chat';
 
 interface MessageInputProps {
   onSendMessage: (data: CreateMessageData) => void;
@@ -48,7 +48,7 @@ export function MessageInput({ onSendMessage, onCreateOrder, chatId, disabled = 
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `chat-attachments/${fileName}`;
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('files')
         .upload(filePath, file);
 

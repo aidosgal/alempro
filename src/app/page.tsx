@@ -1,6 +1,5 @@
 'use client';
 
-import { useAuthStore } from '@/entities/auth';
 import { createClient } from '@/shared/supabase/client';
 import DefaultLayout from '@/widgets/layout/DefaultLayout';
 import { useRouter } from 'next/navigation';
@@ -34,7 +33,6 @@ interface ActiveChat {
 }
 
 export default function Page() {
-  const { logout } = useAuthStore();
   const router = useRouter();
   const supabase = createClient();
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -146,13 +144,13 @@ export default function Page() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <StatCard
             title="Баланс организации"
-            value={`₸${stats?.organizationBalance?.toLocaleString() || 0}`}
+            value={`${stats?.organizationBalance?.toLocaleString() || 0} ₸`}
             subtitle="Текущий баланс"
             large
           />
           <StatCard
             title="Доход за месяц"
-            value={`₸${stats?.monthlyRevenue?.toLocaleString() || 0}`}
+            value={`${stats?.monthlyRevenue?.toLocaleString() || 0} ₸`}
             subtitle="Поступления"
             large
           />
@@ -177,7 +175,7 @@ export default function Page() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-black">₸{order.price?.toLocaleString() || 0}</p>
+                    <p className="font-semibold text-black">{order.price?.toLocaleString() || 0} ₸</p>
                   </div>
                 </div>
               )) || (

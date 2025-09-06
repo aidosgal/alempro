@@ -17,7 +17,7 @@ const DefaultLayout: React.FC<Props> = ({ children }) => {
     <ProtectedRoute>
       <div className="flex min-h-screen">
         <SideBar isClosed={isSidebarClosed} onClose={toggleSidebar} />
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1">{children}</main>
       </div>
     </ProtectedRoute>
   );

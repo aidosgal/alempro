@@ -27,6 +27,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     let mounted = true;
 
     const getSession = async () => {
+      // Небольшая задержка для предотвращения мерцания
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      if (!mounted) return;
+      
       setLoading(true);
       
       try {

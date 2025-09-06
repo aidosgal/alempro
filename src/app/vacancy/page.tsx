@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/entities/auth';
 import { VacancyWithDetails, CreateVacancyData, UpdateVacancyData, useVacancyStore } from '@/entities/vacancy';
 import { VacancyForm, VacancyList } from '@/features/vacancy';
@@ -27,19 +27,7 @@ export default function VacancyPage() {
   const [organizationId, setOrganizationId] = useState<string | null>(null);
   const [loadingOrganization, setLoadingOrganization] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      fetchOrganizationId();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (organizationId) {
-      fetchVacancies(organizationId);
-    }
-  }, [organizationId, fetchVacancies]);
-
-  const fetchOrganizationId = async () => {
+  const fetchOrganizationId = useCallback(async () => {
     try {
       setLoadingOrganization(true);
       
@@ -73,7 +61,19 @@ export default function VacancyPage() {
     } finally {
       setLoadingOrganization(false);
     }
-  };
+  }, [user?.id, supabase]);
+
+  useEffect(() => {
+    if (user) {
+      fetchOrganizationId();
+    }
+  }, [user, fetchOrganizationId]);
+
+  useEffect(() => {
+    if (organizationId) {
+      fetchVacancies(organizationId);
+    }
+  }, [organizationId, fetchVacancies]);
 
   const handleSubmit = async (data: CreateVacancyData | UpdateVacancyData): Promise<boolean> => {
     if ('id' in data) {

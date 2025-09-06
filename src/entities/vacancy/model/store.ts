@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createClient } from '@/shared/supabase/client';
-import { VacancyWithDetails, CreateVacancyData, UpdateVacancyData } from './types';
+import { VacancyWithDetails, CreateVacancyData, UpdateVacancyData, VacancyDetails } from './types';
 
 interface VacancyStore {
   vacancies: VacancyWithDetails[];
@@ -35,7 +35,7 @@ export const useVacancyStore = create<VacancyStore>((set, get) => ({
 
       const vacanciesWithDetails = (data || []).map(vacancy => ({
         ...vacancy,
-        details: vacancy.details as any
+        details: vacancy.details as VacancyDetails
       }));
 
       set({ vacancies: vacanciesWithDetails, loading: false });
@@ -57,7 +57,7 @@ export const useVacancyStore = create<VacancyStore>((set, get) => ({
         .insert([{
           title: data.title,
           description: data.description,
-          details: data.details,
+          details: data.details as unknown,
           organization_id: data.organization_id
         }]);
 
@@ -81,11 +81,11 @@ export const useVacancyStore = create<VacancyStore>((set, get) => ({
     
     try {
       const supabase = createClient();
-      const updateData: any = {};
+      const updateData: Record<string, unknown> = {};
       
       if (data.title) updateData.title = data.title;
       if (data.description) updateData.description = data.description;
-      if (data.details) updateData.details = data.details;
+      if (data.details) updateData.details = data.details as unknown;
 
       const { error } = await supabase
         .from('vacancies')
@@ -98,7 +98,12 @@ export const useVacancyStore = create<VacancyStore>((set, get) => ({
       const currentVacancies = get().vacancies;
       const updatedVacancies = currentVacancies.map(vacancy =>
         vacancy.id === data.id 
-          ? { ...vacancy, ...updateData, details: updateData.details || vacancy.details }
+          ? { 
+              ...vacancy, 
+              title: data.title || vacancy.title,
+              description: data.description || vacancy.description,
+              details: data.details || vacancy.details
+            }
           : vacancy
       );
       

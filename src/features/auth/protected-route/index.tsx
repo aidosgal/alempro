@@ -14,11 +14,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Отладочная информация
-    console.log('ProtectedRoute:', { isAuthenticated, isLoading, pathname });
-    
     if (!isLoading && !isAuthenticated && !pathname.startsWith('/auth')) {
-      console.log('Redirecting to login from:', pathname);
       router.replace('/auth/login');
     }
   }, [isAuthenticated, isLoading, router, pathname]);

@@ -4,7 +4,7 @@ import { useAuthStore } from '@/entities/auth';
 import { createClient } from '@/shared/supabase/client';
 import DefaultLayout from '@/widgets/layout/DefaultLayout';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 interface DashboardStats {
   totalApplicants: number;
@@ -13,25 +13,36 @@ interface DashboardStats {
   totalChats: number;
   totalServices: number;
   organizationBalance: number;
-  recentOrders: any[];
-  activeChats: any[];
+  recentOrders: RecentOrder[];
+  activeChats: ActiveChat[];
   monthlyRevenue: number;
   completedOrdersToday: number;
 }
 
+interface RecentOrder {
+  id: string;
+  title: string;
+  price: number | null;
+  created_at: string | null;
+}
+
+interface ActiveChat {
+  id: string;
+  last_message_text: string | null;
+  last_message_at: string | null;
+  applicant_id: string;
+}
+
 export default function Page() {
-  const { user, logout } = useAuthStore();
+  const { logout } = useAuthStore();
   const router = useRouter();
   const supabase = createClient();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
+      // Параллельные запросы для лучшей производительности
       const [
         applicantsResult,
         ordersResult,
@@ -52,12 +63,14 @@ export default function Page() {
         supabase.from('chats').select('id, last_message_text, last_message_at, applicant_id').order('last_message_at', { ascending: false }).limit(5)
       ]);
 
+      // Подсчет месячного дохода
       const currentMonth = new Date().toISOString().slice(0, 7);
       const monthlyOrders = ordersResult.data?.filter(order => 
         order.created_at?.startsWith(currentMonth)
       ) || [];
       const monthlyRevenue = monthlyOrders.reduce((sum, order) => sum + (order.price || 0), 0);
 
+      // Подсчет завершенных заказов сегодня
       const today = new Date().toISOString().slice(0, 10);
       const todayOrders = ordersResult.data?.filter(order => 
         order.created_at?.startsWith(today)
@@ -80,13 +93,11 @@ export default function Page() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    logout();
-    router.push('/auth/login');
-  };
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   if (loading) {
     return (
@@ -157,12 +168,12 @@ export default function Page() {
           <div className="border border-gray-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-black mb-4">Последние заказы</h3>
             <div className="space-y-3">
-              {stats?.recentOrders?.map((order, index) => (
+              {stats?.recentOrders?.map((order) => (
                 <div key={order.id} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
                   <div>
                     <p className="font-medium text-black">{order.title}</p>
                     <p className="text-sm text-gray-600">
-                      {new Date(order.created_at).toLocaleDateString('ru-RU')}
+                      {order.created_at ? new Date(order.created_at).toLocaleDateString('ru-RU') : 'Дата не указана'}
                     </p>
                   </div>
                   <div className="text-right">
@@ -178,7 +189,7 @@ export default function Page() {
           <div className="border border-gray-200 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-black mb-4">Активные чаты</h3>
             <div className="space-y-3">
-              {stats?.activeChats?.map((chat, index) => (
+              {stats?.activeChats?.map((chat) => (
                 <div key={chat.id} className="py-2 border-b border-gray-100 last:border-b-0">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -190,7 +201,7 @@ export default function Page() {
                       </p>
                     </div>
                     <span className="text-xs text-gray-500 ml-2">
-                      {chat.last_message_at ? new Date(chat.last_message_at).toLocaleDateString('ru-RU') : ''}
+                      {chat.last_message_at ? new Date(chat.last_message_at).toLocaleDateString('ru-RU') : 'Дата не указана'}
                     </span>
                   </div>
                 </div>

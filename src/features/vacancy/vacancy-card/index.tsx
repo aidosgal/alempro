@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { VacancyWithDetails } from '@/entities/vacancy';
+import { VacancyWithDetails, VacancyDetails } from '@/entities/vacancy';
 
 interface VacancyCardProps {
   vacancy: VacancyWithDetails;
@@ -10,12 +10,12 @@ interface VacancyCardProps {
 export function VacancyCard({ vacancy, onEdit, onDelete }: VacancyCardProps) {
   const [showDetails, setShowDetails] = useState(false);
 
-  const formatSalary = (salary: any) => {
+  const formatSalary = (salary: VacancyDetails['salary'] | undefined) => {
     if (!salary) return 'Не указана';
     return `${salary.from}-${salary.to} ${salary.currency} / ${salary.period}`;
   };
 
-  const formatLocation = (location: any) => {
+  const formatLocation = (location: VacancyDetails['location'] | undefined) => {
     if (!location) return 'Не указано';
     return `${location.city}, ${location.country}`;
   };

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import { MessageWithSender } from '@/entities/chat';
-import Image from 'next/image';
 
 interface MessageListProps {
   messages: MessageWithSender[];
@@ -124,7 +123,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
             if (isImage) {
               return (
                 <div key={attachment.id} className="relative">
-                  <Image 
+                  <img 
                     src={attachment.url} 
                     alt={attachment.filename || 'Shared image'} 
                     width={400}
@@ -181,7 +180,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
       return (
         <div className="space-y-2">
           <div className="relative">
-            <Image 
+            <img 
               src={message.content} 
               alt="Shared image" 
               width={400}

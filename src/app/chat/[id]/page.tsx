@@ -147,19 +147,40 @@ export default function ChatDetailPage() {
         if (servicesError) throw servicesError;
       }
 
-      // Send message about the order
-      await sendMessage({
+      // Send message about the order (empty content)
+      const messageResponse = await sendMessage({
         chatId: data.chatId,
-        content: `Создан новый заказ: ${data.title}`,
+        content: '', // Empty content as requested
         metadata: {
-          type: 'order',
-          orderId: orderData.id,
-          description: data.description,
-          price: data.price,
-          deadline: data.deadline,
-          services: data.services
+          type: 'order'
         }
       });
+
+      // If message was sent successfully, create the message_orders link
+      if (messageResponse) {
+        // Get the latest message to link with the order
+        const { data: latestMessage, error: messageError } = await supabase
+          .from('messages')
+          .select('id')
+          .eq('chat_id', data.chatId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (!messageError && latestMessage) {
+          // Create the message_orders link
+          const { error: messageOrderError } = await supabase
+            .from('message_orders')
+            .insert({
+              message_id: latestMessage.id,
+              order_id: orderData.id
+            });
+
+          if (messageOrderError) {
+            console.error('Error linking message to order:', messageOrderError);
+          }
+        }
+      }
 
       setShowOrderModal(false);
     } catch (error) {

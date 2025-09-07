@@ -233,7 +233,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         .from('chats')
         .update({
           last_message_at: new Date().toISOString(),
-          last_message_text: data.content,
+          last_message_text: data.content || '📋 Новый заказ', // Show order indicator for empty content
           last_sender: 'manager'
         })
         .eq('id', data.chatId);

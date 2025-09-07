@@ -50,7 +50,7 @@ export function KanbanColumn({ id, title, children, count }: KanbanColumnProps) 
       </div>
 
       {/* Column Content */}
-      <div className="p-4 space-y-3 min-h-96 max-h-96 overflow-y-auto">
+      <div className="p-4 space-y-3 min-h-96 overflow-y-auto">
         {children}
       </div>
     </div>

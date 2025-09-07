@@ -109,7 +109,7 @@ export function MessageInput({ onSendMessage, onCreateOrder, chatId, disabled = 
 
   return (
     <div className="border-t border-gray-200 bg-white p-4">
-      <form onSubmit={handleSubmit} className="flex items-end space-x-3">
+      <form onSubmit={handleSubmit} className="flex items-center space-x-3">
         {/* File input */}
         <input
           ref={fileInputRef}
@@ -153,7 +153,7 @@ export function MessageInput({ onSendMessage, onCreateOrder, chatId, disabled = 
         </div>
         
         {/* Message input */}
-        <div className="flex-1 relative">
+        <div className="flex-1">
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
